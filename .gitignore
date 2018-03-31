@@ -69,3 +69,5 @@ fabric.properties
 *.zip
 *.tar.gz
 *.rar
+
+build
