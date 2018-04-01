@@ -33,7 +33,7 @@ class SyntaxHighlighter : SyntaxHighlighterBase() {
     }
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        return arrayOf(HighlightType.index[tokenType]!!)
+        return pack(HighlightType.index[tokenType], null)
     }
 
     class Factory : SyntaxHighlighterFactory() {
