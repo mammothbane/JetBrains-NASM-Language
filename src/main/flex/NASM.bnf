@@ -1,5 +1,7 @@
 /*
- * Copyright (c) 2018 Nathan Perry, Aidan Khoury. All rights reserved.
+ * Modified 3/31/18 - changed packages and removed generated class prefix.
+ * Modifications copyright (c) 2018 Nathan Perry.
+ * Copyright (c) 2017-2018 Aidan Khoury. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +18,21 @@
  */
 
 {
-    parserClass="com.avaglir.jetbrains.nasmplugin.parser.NASMParser"
-    parserUtilClass="com.avaglir.jetbrains.nasmplugin.parser.NASMParserUtil"
+    parserClass="com.avaglir.jetbrains.nasmplugin.parser.Parser"
+    parserUtilClass="com.avaglir.jetbrains.nasmplugin.parser.ParserUtil"
 
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
-    psiClassPrefix="NASM"
+    psiClassPrefix=""
     psiImplClassSuffix="Impl"
     psiPackage="com.avaglir.jetbrains.nasmplugin.psi"
     psiImplPackage="com.avaglir.jetbrains.nasmplugin.psi.impl"
 
     elementTypeHolderClass="com.avaglir.jetbrains.nasmplugin.psi.NASMTypes"
-    elementTypeClass="com.avaglir.jetbrains.nasmplugin.psi.NASMElementType"
-    tokenTypeClass="com.avaglir.jetbrains.nasmplugin.psi.NASMTokenType"
+    elementTypeClass="com.avaglir.jetbrains.nasmplugin.psi.ElementType"
+    tokenTypeClass="com.avaglir.jetbrains.nasmplugin.psi.TokenType"
 
-    psiImplUtilClass="com.avaglir.jetbrains.nasmplugin.psi.impl.NASMPsiImplUtil"
+    psiImplUtilClass="com.avaglir.jetbrains.nasmplugin.psi.impl.PsiImplUtil"
 
     tokens = [
         CRLF                = 'regexp:\r|\n|\r\n'
@@ -292,12 +294,15 @@ Include ::= (INCLUDE_TAG STRING) {methods=[getIncludeString]}
 Define ::= (DEFINE_TAG Identifier ROUND_L (Identifier (SEPARATOR Identifier)*)? ROUND_R Expr CRLF*)
         | (DEFINE_TAG Identifier (Expr|(PERCENT SQUARE_L Expr SQUARE_R)) CRLF*) {methods=[getDefineIdentifier getDefineIdentifierString]}
 Assign ::= (ASSIGN_TAG Identifier Expr)
+
 Macro ::= MACRO_TAG (Identifier MacroParams MacroDefaultParam? CRLF* (MacroLabel|Data|Instruction)*) MACRO_END_TAG { pin=1 methods=[getMacroIdentifier]}
 MacroLabel ::= (MACRO_PARAM_LBL_DEF (Instruction|Data)? CRLF*)
 private MacroParams ::= ((NumericLiteral MINUS NumericLiteral TIMES?)|(NumericLiteral MINUS TIMES)|(NumericLiteral PLUS?))
 private MacroDefaultParam ::= (Instruction|STRING|REGISTER|NumericLiteral|MacroCall)
+
 Strlen ::= STRLEN_TAG Identifier (STRING|Identifier) CRLF*
 Error ::= ERROR_TAG CRLF*
+
 Conditional ::= (IF_TAG Condition CRLF* (Preprocessor|Constant|Directive|Label|Structure|Data|Instruction)* ((ELIF_TAG Condition|ELSE_TAG) CRLF* (Preprocessor|Constant|Directive|Label|Structure|Data|Instruction)*)* ENDIF_TAG CRLF*)
             | (IFMACRO_TAG Identifier MacroParams MacroDefaultParam? CRLF* (Preprocessor|Directive|Data|Instruction)* ENDIF_TAG)
 private Condition ::= ((Expr EQUALEQUAL Expr)|Expr)
@@ -323,6 +328,7 @@ MapOption ::= SQUARE_L 'map' ('all'|'brief'|'sections'|'segments'|'symbols')? MA
 Directive ::= (DirectiveDecl|DirectiveDeclBrackets|MapOption) CRLF*
 private DirectiveDecl ::= DIRECTIVE_OP DirectiveArg*
 private DirectiveDeclBrackets ::= SQUARE_L DirectiveDecl SQUARE_R
+
 DirectiveArg ::= ((MINUS|PLUS)? (MacroCall|NumericLiteral|Address|SegmentAddress|Identifier))
 
 // Root expression rules
@@ -351,6 +357,7 @@ Expr ::= ParenthesisExpr
         | Identifier
         | LabelIdentifier
         ;
+
 NumericExpr ::= ParenthesisNumericExpr
         | MulExpr
         | DivExpr
@@ -380,29 +387,36 @@ DivExpr ::= Expr DIVIDE Expr { extends=Expr }
 PlusExpr ::= Expr PLUS Expr { extends=Expr }
 MinusExpr ::= Expr MINUS Expr { extends=Expr }
 ModulusExpr ::= Expr PERCENT Expr { extends=Expr }
+
 BitShiftLExpr ::= Expr BITSHIFT_L Expr { extends=Expr }
 BitShiftRExpr ::= Expr BITSHIFT_R Expr { extends=Expr }
 BitwiseANDExpr ::= Expr BITWISE_AND Expr { extends=Expr }
 BitwiseORExpr ::= Expr BITWISE_OR Expr { extends=Expr }
 BitwiseXORExpr ::= Expr BITWISE_XOR Expr { extends=Expr }
 BitwiseNOTExpr ::= BITWISE_NOT NumericExpr { extends=Expr }
+
 ParenthesisExpr ::= ROUND_L Expr ROUND_R { pin(".*")=1 extends=Expr }
 ParenthesisNumericExpr ::= ROUND_L NumericExpr ROUND_R { pin(".*")=1 extends=NumericExpr }
 
 NumericLiteral ::= ((SIZE_TYPE (BITWISE_NOT|MINUS|PLUS)?)? (BINARY|ZEROES|HEXADECIMAL|DECIMAL|CHARACTER)) { extends=Expr }
-Identifier ::= ID { extends=Expr mixin="com.avaglir.jetbrains.nasmplugin.psi.impl.NASMNamedElementImpl" implements="com.avaglir.jetbrains.nasmplugin.psi.NASMNamedElement" methods=[getName setName getNameIdentifier] }
+Identifier ::= ID { extends=Expr mixin="com.avaglir.jetbrains.nasmplugin.psi.impl.NamedElementImpl" implements="com.avaglir.jetbrains.nasmplugin.psi.NamedElement" methods=[getName setName getNameIdentifier] }
 LabelIdentifier ::= (SIZE_TYPE? (LBL|ID)) { extends=Expr }
+
 Reg ::= REGISTER { extends=Expr }
 Seg ::= SEGMENT_REGISTER { extends=Expr }
 Str ::= STRING { extends=Expr }
+
 StructureField ::= STRUCT_FIELD { extends=Expr }
 SegmentAddress ::= (SIZE_TYPE? ((SEGMENT_ADDR_L (HEXADECIMAL|ZEROES|MacroCall|ID|LBL))|
                                 (LBL_DEF (SIZE_TYPE? (HEXADECIMAL|ZEROES|MacroCall|ID|LBL)))|
                                 (LabelDefMacro (SIZE_TYPE? (HEXADECIMAL|ZEROES|MacroCall|ID|LBL))))) { extends=Expr }
+
 Address ::= (SIZE_TYPE? AddressInternal)|DOLLARSIGN|DOLLARSIGN2 { extends=Expr }
 private AddressInternal ::= SQUARE_L MINUS? Expr SQUARE_R { pin(".*")=1 }
+
 MacroCall ::= SIZE_TYPE? ((Identifier MacroParenthesis)|(Identifier NumericExpr)) { extends=Expr }
 private MacroParenthesis ::= ROUND_L (NumericExpr (SEPARATOR NumericExpr)*)? ROUND_R { pin(".*")=1 }
+
 MacroParamReference ::= (SIZE_TYPE? MACRO_PARAM_REF) { extends=Expr }
 MacroVarReference ::= (SIZE_TYPE? MACRO_VAR_REF) { extends=Expr }
 

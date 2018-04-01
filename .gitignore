@@ -71,3 +71,4 @@ fabric.properties
 *.rar
 
 build
+gen
