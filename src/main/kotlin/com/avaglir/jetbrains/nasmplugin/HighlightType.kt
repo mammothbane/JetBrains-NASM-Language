@@ -26,7 +26,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 
-enum class HighlightType(val externalName: String, val fallbackAttrKey: TextAttributesKey, vararg val types: IElementType) {
+enum class HighlightType(val externalName: String, val fallbackAttrKey: TextAttributesKey, vararg val elementTypes: IElementType) {
     REGISTER("REGISTER", DefaultLanguageHighlighterColors.LOCAL_VARIABLE, NASMTypes.REGISTER),
     SEGMENT_REGISTER("SEGMENT_REGISTER", DefaultLanguageHighlighterColors.GLOBAL_VARIABLE, NASMTypes.SEGMENT_REGISTER),
 
@@ -78,13 +78,13 @@ enum class HighlightType(val externalName: String, val fallbackAttrKey: TextAttr
     BAD_CHARACTER("BAD_CHARACTER", HighlighterColors.BAD_CHARACTER, TokenType.BAD_CHARACTER);
 
     val attrKey by lazy {
-        types.firstOrNull()?.let { type -> HighlightType.index[type] } ?: TextAttributesKey.createTextAttributesKey(externalName, fallbackAttrKey)
+        elementTypes.firstOrNull()?.let { type -> HighlightType.index[type] } ?: TextAttributesKey.createTextAttributesKey(externalName, fallbackAttrKey)
     }
 
     companion object {
         val index by lazy {
             HighlightType.values().flatMap { v ->
-                v.types.map { type -> type to TextAttributesKey.createTextAttributesKey(v.externalName, v.fallbackAttrKey) }
+                v.elementTypes.map { type -> type to TextAttributesKey.createTextAttributesKey(v.externalName, v.fallbackAttrKey) }
             }.toMap()
         }
     }

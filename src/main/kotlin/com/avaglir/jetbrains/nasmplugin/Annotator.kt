@@ -43,7 +43,7 @@ class Annotator : Annotator {
                 val file = element.parent.containingFile
 
                 when (element.parent) {
-                    is IStruc, is Struc -> {
+                    is IStruct, is Struct -> {
                         element.highlight(HighlightType.STRUCTURE)
                         val children = PsiTreeUtil.getChildrenOfType(element.parent, LabelIdentifier::class.java) ?: return
                         children

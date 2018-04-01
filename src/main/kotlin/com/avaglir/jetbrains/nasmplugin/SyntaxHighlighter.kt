@@ -19,13 +19,26 @@
 
 package com.avaglir.jetbrains.nasmplugin
 
-import com.intellij.openapi.fileTypes.SyntaxHighlighter
+import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.tree.IElementType
+import com.intellij.lexer.Lexer as JBLexer
 
-class SyntaxHighlighter : SyntaxHighlighterFactory() {
-    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): SyntaxHighlighter {
-        return NASMSyntaxHighlighter()
+class SyntaxHighlighter : SyntaxHighlighterBase() {
+    override fun getHighlightingLexer(): JBLexer {
+        return Lexer.compatLexer()
+    }
+
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
+        return arrayOf(HighlightType.index[tokenType]!!)
+    }
+
+    class Factory : SyntaxHighlighterFactory() {
+        override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?): com.intellij.openapi.fileTypes.SyntaxHighlighter {
+            return SyntaxHighlighter()
+        }
     }
 }

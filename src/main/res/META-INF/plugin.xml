@@ -56,9 +56,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Add your extensions here -->
-        <fileTypeFactory implementation="com.avaglir.jetbrains.nasmplugin.FileTypeFactory"/>
+        <fileTypeFactory implementation="com.avaglir.jetbrains.nasmplugin.FileType$Factory"/>
         <lang.parserDefinition language="NASM" implementationClass="com.avaglir.jetbrains.nasmplugin.ParserDefinition"/>
-        <lang.syntaxHighlighterFactory key="NASM" language="NASM" implementationClass="com.avaglir.jetbrains.nasmplugin.SyntaxHighlighter"/>
+        <lang.syntaxHighlighterFactory key="NASM" language="NASM" implementationClass="com.avaglir.jetbrains.nasmplugin.SyntaxHighlighter$Factory"/>
         <colorSettingsPage implementation="com.avaglir.jetbrains.nasmplugin.ColorSettingsPage"/>
         <lang.braceMatcher language="NASM" implementationClass="com.avaglir.jetbrains.nasmplugin.PairedBraceMatcher"/>
         <completion.contributor language="NASM" implementationClass="com.avaglir.jetbrains.nasmplugin.CompletionContributor"/>

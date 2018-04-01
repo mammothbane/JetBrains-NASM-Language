@@ -20,10 +20,10 @@
 package com.avaglir.jetbrains.nasmplugin
 
 import com.intellij.openapi.editor.colors.TextAttributesKey
-import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.options.colors.AttributesDescriptor
 import com.intellij.openapi.options.colors.ColorDescriptor
 import javax.swing.Icon
+import com.intellij.openapi.fileTypes.SyntaxHighlighter as JBSyntaxHighlighter
 import com.intellij.openapi.options.colors.ColorSettingsPage as JBColorSettingsPage
 
 class ColorSettingsPage : JBColorSettingsPage {
@@ -31,8 +31,8 @@ class ColorSettingsPage : JBColorSettingsPage {
         return Icons.ASM_FILE
     }
 
-    override fun getHighlighter(): SyntaxHighlighter {
-        return NASMSyntaxHighlighter()
+    override fun getHighlighter(): JBSyntaxHighlighter {
+        return SyntaxHighlighter()
     }
 
     override fun getDemoText(): String {

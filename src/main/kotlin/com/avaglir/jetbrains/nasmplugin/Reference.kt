@@ -19,43 +19,25 @@
 
 package com.avaglir.jetbrains.nasmplugin
 
-import com.intellij.codeInsight.lookup.LookupElement
+import com.avaglir.jetbrains.nasmplugin.psi.Identifier
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.*
-import java.util.*
 
 class Reference(element: PsiElement, textRange: TextRange) : PsiReferenceBase<PsiElement>(element, textRange), PsiPolyVariantReference {
     private val id: String = element.text.substring(textRange.startOffset, textRange.endOffset)
 
-    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> {
-        val project = myElement.project
-
-        val identifiers = NASMUtil.findIdentifierReferencesByStringInProject(project, id)
-        val results = ArrayList<ResolveResult>()
-        for (identifier in identifiers) {
-            results.add(PsiElementResolveResult(identifier))
-        }
-        return results.toTypedArray()
-    }
+    override fun multiResolve(incompleteCode: Boolean): Array<ResolveResult> = myElement.project.findAll<Identifier>()
+            .filter { it.id.text == id }.map { PsiElementResolveResult(it) }.toTypedArray()
 
     override fun resolve(): PsiElement? {
         val resolveResults = multiResolve(false)
         return if (resolveResults.size == 1) resolveResults[0].element else null
     }
 
-    override fun getVariants(): Array<Any> {
-        val project = myElement.project
-        val identifiers = NASMUtil.findIdentifierReferencesInProject(project)
-        val variants = ArrayList<LookupElement>()
-        for (identifier in identifiers) {
-            val identifierText = identifier.id.text
-            if (identifierText != null && identifierText.length > 0) {
-                variants.add(LookupElementBuilder.create(identifier).withIcon(Icons.ASM_FILE).withTypeText(identifier.containingFile.name)
-                )
-            }
-        }
-        return variants.toTypedArray()
-    }
-
+    override fun getVariants(): Array<Any> = myElement.project.findAll<Identifier>()
+                .filter { it.text.isNotEmpty() }
+                .map {
+                    LookupElementBuilder.create(it).withIcon(Icons.ASM_FILE).withTypeText(it.containingFile.name)
+                }.toTypedArray()
 }

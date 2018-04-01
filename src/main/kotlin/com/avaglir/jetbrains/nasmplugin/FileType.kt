@@ -19,6 +19,8 @@
 
 package com.avaglir.jetbrains.nasmplugin
 
+import com.intellij.openapi.fileTypes.FileTypeConsumer
+import com.intellij.openapi.fileTypes.FileTypeFactory
 import com.intellij.openapi.fileTypes.LanguageFileType
 import javax.swing.Icon
 
@@ -40,4 +42,10 @@ object FileType : LanguageFileType(Language) {
     }
 
     const val EXTENSION = "asm"
+
+    class Factory : FileTypeFactory() {
+        override fun createFileTypes(fileTypeConsumer: FileTypeConsumer) {
+            fileTypeConsumer.consume(FileType, FileType.EXTENSION)
+        }
+    }
 }
