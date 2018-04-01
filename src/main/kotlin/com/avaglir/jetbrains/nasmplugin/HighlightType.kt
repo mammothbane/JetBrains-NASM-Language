@@ -19,7 +19,7 @@
 
 package com.avaglir.jetbrains.nasmplugin
 
-import com.avaglir.jetbrains.nasmplugin.psi.NASMTypes
+import com.avaglir.jetbrains.nasmplugin.psi.Types
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
@@ -27,54 +27,54 @@ import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 
 enum class HighlightType(val externalName: String, val fallbackAttrKey: TextAttributesKey, vararg val elementTypes: IElementType) {
-    REGISTER("REGISTER", DefaultLanguageHighlighterColors.LOCAL_VARIABLE, NASMTypes.REGISTER),
-    SEGMENT_REGISTER("SEGMENT_REGISTER", DefaultLanguageHighlighterColors.GLOBAL_VARIABLE, NASMTypes.SEGMENT_REGISTER),
+    REGISTER("REGISTER", DefaultLanguageHighlighterColors.LOCAL_VARIABLE, Types.REGISTER),
+    SEGMENT_REGISTER("SEGMENT_REGISTER", DefaultLanguageHighlighterColors.GLOBAL_VARIABLE, Types.SEGMENT_REGISTER),
 
     OPERATION("OPERATION", DefaultLanguageHighlighterColors.KEYWORD,
-            NASMTypes.GENERAL_OP,
-            NASMTypes.SYSTEM_OP,
-            NASMTypes.VIRTUALIZATION_OP,
-            NASMTypes.X64_OP,
-            NASMTypes.FPU_OP,
-            NASMTypes.MMX_OP,
-            NASMTypes.SSE_OP,
-            NASMTypes.SSE2_OP,
-            NASMTypes.SSE3_OP,
-            NASMTypes.SSE4_OP,
-            NASMTypes.AVX_OP,
-            NASMTypes.AVX2_OP,
-            NASMTypes.AVX512_OP,
-            NASMTypes.DATA_OP
+            Types.GENERAL_OP,
+            Types.SYSTEM_OP,
+            Types.VIRTUALIZATION_OP,
+            Types.X64_OP,
+            Types.FPU_OP,
+            Types.MMX_OP,
+            Types.SSE_OP,
+            Types.SSE2_OP,
+            Types.SSE3_OP,
+            Types.SSE4_OP,
+            Types.AVX_OP,
+            Types.AVX2_OP,
+            Types.AVX512_OP,
+            Types.DATA_OP
         ),
 
     NUMBER("NUMBER", DefaultLanguageHighlighterColors.NUMBER,
-            NASMTypes.NUMERIC_LITERAL, NASMTypes.BINARY, NASMTypes.HEXADECIMAL,
-            NASMTypes.ZEROES, NASMTypes.DECIMAL, NASMTypes.SEGMENT_ADDR_L
+            Types.NUMERIC_LITERAL, Types.BINARY, Types.HEXADECIMAL,
+            Types.ZEROES, Types.DECIMAL, Types.SEGMENT_ADDR_L
     ),
 
     LABEL("LABEL", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION,
-            NASMTypes.LBL, NASMTypes.LBL_DEF
-            //, NASMTypes.LBL_INS, NASMTypes.LBL_DATA
+            Types.LBL, Types.LBL_DEF
+            //, Types.LBL_INS, Types.LBL_DATA
     ),
 
-    SEPARATOR("SEPARATOR", DefaultLanguageHighlighterColors.COMMA, NASMTypes.SEPARATOR),
-    SIZE_TYPE("SIZE_TYPE", DefaultLanguageHighlighterColors.METADATA, NASMTypes.SIZE_TYPE),
-    OP_PREFIX("OP_PREFIX", DefaultLanguageHighlighterColors.METADATA, NASMTypes.OP_PREFIX),
-    COMMENT("COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT, NASMTypes.COMMENT),
-    IDENTIFIER("IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER, NASMTypes.IDENTIFIER),
+    SEPARATOR("SEPARATOR", DefaultLanguageHighlighterColors.COMMA, Types.SEPARATOR),
+    SIZE_TYPE("SIZE_TYPE", DefaultLanguageHighlighterColors.METADATA, Types.SIZE_TYPE),
+    OP_PREFIX("OP_PREFIX", DefaultLanguageHighlighterColors.METADATA, Types.OP_PREFIX),
+    COMMENT("COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT, Types.COMMENT),
+    IDENTIFIER("IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER, Types.IDENTIFIER),
 
-    MACRO("MACRO", DefaultLanguageHighlighterColors.CONSTANT, NASMTypes.MACRO, NASMTypes.MACRO_CALL),
-    MACRO_PARAM_REF("MACRO_PARAM_REF", DefaultLanguageHighlighterColors.PARAMETER, NASMTypes.MACRO_PARAM_REF),
-    MACRO_VAR_REF("MACRO_VAR_REF", HighlightType.MACRO_PARAM_REF.fallbackAttrKey, NASMTypes.MACRO_VAR_REF),
-    MACRO_LABEL("MACRO_LABEL", HighlightType.LABEL.fallbackAttrKey, NASMTypes.MACRO_LABEL),
+    MACRO("MACRO", DefaultLanguageHighlighterColors.CONSTANT, Types.MACRO, Types.MACRO_CALL),
+    MACRO_PARAM_REF("MACRO_PARAM_REF", DefaultLanguageHighlighterColors.PARAMETER, Types.MACRO_PARAM_REF),
+    MACRO_VAR_REF("MACRO_VAR_REF", HighlightType.MACRO_PARAM_REF.fallbackAttrKey, Types.MACRO_VAR_REF),
+    MACRO_LABEL("MACRO_LABEL", HighlightType.LABEL.fallbackAttrKey, Types.MACRO_LABEL),
 
     DIRECTIVE("DIRECTIVE", DefaultLanguageHighlighterColors.KEYWORD,
-            NASMTypes.DIRECTIVE_OP, NASMTypes.SECTION, NASMTypes.SEGMENT, NASMTypes.EQU),
+            Types.DIRECTIVE_OP, Types.SECTION, Types.SEGMENT, Types.EQU),
 
-    STRING("STRING", DefaultLanguageHighlighterColors.STRING, NASMTypes.STRING),
-    CONSTANT("CONSTANT", DefaultLanguageHighlighterColors.CONSTANT, NASMTypes.CONSTANT),
-    STRUCTURE("STRUCTURE", DefaultLanguageHighlighterColors.CLASS_NAME, NASMTypes.STRUCTURE),
-    STRUCTURE_FIELD("STRUCTURE_FIELD", HighlightType.STRUCTURE.fallbackAttrKey, NASMTypes.STRUCT_FIELD),
+    STRING("STRING", DefaultLanguageHighlighterColors.STRING, Types.STRING),
+    CONSTANT("CONSTANT", DefaultLanguageHighlighterColors.CONSTANT, Types.CONSTANT),
+    STRUCTURE("STRUCTURE", DefaultLanguageHighlighterColors.CLASS_NAME, Types.STRUCTURE),
+    STRUCTURE_FIELD("STRUCTURE_FIELD", HighlightType.STRUCTURE.fallbackAttrKey, Types.STRUCT_FIELD),
     BAD_CHARACTER("BAD_CHARACTER", HighlighterColors.BAD_CHARACTER, TokenType.BAD_CHARACTER);
 
     val attrKey by lazy {

@@ -19,7 +19,7 @@
 
 package com.avaglir.jetbrains.nasmplugin
 
-import com.avaglir.jetbrains.nasmplugin.psi.NASMTypes
+import com.avaglir.jetbrains.nasmplugin.psi.Types
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns
@@ -34,7 +34,7 @@ class CompletionContributor : DefaultCompletionContributor() {
 
     init {
         extend(CompletionType.BASIC,
-                PlatformPatterns.psiElement(NASMTypes.IDENTIFIER).withLanguage(Language),
+                PlatformPatterns.psiElement(Types.IDENTIFIER).withLanguage(Language),
                 CompProvider)
     }
 }

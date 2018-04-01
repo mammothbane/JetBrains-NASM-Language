@@ -21,7 +21,7 @@ package com.avaglir.jetbrains.nasmplugin
 
 import com.avaglir.jetbrains.nasmplugin.parser.Parser
 import com.avaglir.jetbrains.nasmplugin.psi.File
-import com.avaglir.jetbrains.nasmplugin.psi.NASMTypes
+import com.avaglir.jetbrains.nasmplugin.psi.Types
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.lang.PsiParser
@@ -69,12 +69,12 @@ class ParserDefinition : ParserDefinition {
     }
 
     override fun createElement(node: ASTNode): PsiElement {
-        return NASMTypes.Factory.createElement(node)
+        return Types.Factory.createElement(node)
     }
 
     companion object {
         private val WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE)
-        private val COMMENTS = TokenSet.create(NASMTypes.COMMENT)
+        private val COMMENTS = TokenSet.create(Types.COMMENT)
         private val FILE = IFileElementType(Language)
     }
 }

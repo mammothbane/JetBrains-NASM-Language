@@ -28,7 +28,7 @@
     psiPackage="com.avaglir.jetbrains.nasmplugin.psi"
     psiImplPackage="com.avaglir.jetbrains.nasmplugin.psi.impl"
 
-    elementTypeHolderClass="com.avaglir.jetbrains.nasmplugin.psi.NASMTypes"
+    elementTypeHolderClass="com.avaglir.jetbrains.nasmplugin.psi.Types"
     elementTypeClass="com.avaglir.jetbrains.nasmplugin.psi.ElementType"
     tokenTypeClass="com.avaglir.jetbrains.nasmplugin.psi.TokenType"
 
@@ -289,7 +289,7 @@ private Element ::= COMMENT
 private Section ::= (((SQUARE_L SECTION SQUARE_R) | SECTION) CRLF*)
 private Segment ::= (((SQUARE_L SEGMENT SQUARE_R) | SEGMENT) CRLF*)
 
-Preprocessor ::= Include | Define | Assign | Macro | Strlen | Error | Conditional | (PREPROCESSOR_OP Identifier Expr)
+Preprocessor ::= Include | Define | Assign | Macro | Strlen | Err | Conditional | (PREPROCESSOR_OP Identifier Expr)
 Include ::= (INCLUDE_TAG STRING) {methods=[getIncludeString]}
 Define ::= (DEFINE_TAG Identifier ROUND_L (Identifier (SEPARATOR Identifier)*)? ROUND_R Expr CRLF*)
         | (DEFINE_TAG Identifier (Expr|(PERCENT SQUARE_L Expr SQUARE_R)) CRLF*) {methods=[getDefineIdentifier getDefineIdentifierString]}
@@ -301,7 +301,7 @@ private MacroParams ::= ((NumericLiteral MINUS NumericLiteral TIMES?)|(NumericLi
 private MacroDefaultParam ::= (Instruction|STRING|REGISTER|NumericLiteral|MacroCall)
 
 Strlen ::= STRLEN_TAG Identifier (STRING|Identifier) CRLF*
-Error ::= ERROR_TAG CRLF*
+Err ::= ERROR_TAG CRLF*
 
 Conditional ::= (IF_TAG Condition CRLF* (Preprocessor|Constant|Directive|Label|Structure|Data|Instruction)* ((ELIF_TAG Condition|ELSE_TAG) CRLF* (Preprocessor|Constant|Directive|Label|Structure|Data|Instruction)*)* ENDIF_TAG CRLF*)
             | (IFMACRO_TAG Identifier MacroParams MacroDefaultParam? CRLF* (Preprocessor|Directive|Data|Instruction)* ENDIF_TAG)

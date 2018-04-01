@@ -23,75 +23,44 @@ import com.avaglir.jetbrains.nasmplugin.psi.*
 import com.intellij.psi.PsiElement
 
 object PsiImplUtil {
-
+    @JvmStatic
     fun getIncludeString(element: Include): String? {
-        val includeString = element.node.findChildByType(NASMTypes.STRING)
+        val includeString = element.node.findChildByType(Types.STRING)
         return includeString?.text?.replace("\"", "")?.replace("'", "")
     }
 
-    fun getDefineIdentifierString(element: Define): String? {
-        val defineIdentifier = element.node.findChildByType(NASMTypes.IDENTIFIER)
-        return defineIdentifier?.text
+    @JvmStatic
+    fun getDefineIdentifierString(element: Define): String? = element.node.findChildByType(Types.IDENTIFIER)?.text
+
+    @JvmStatic
+    fun getDefineIdentifier(element: Define): Identifier? = element.node.findChildByType(Types.IDENTIFIER)?.psi as Identifier?
+
+    @JvmStatic
+    fun getMacroIdentifier(element: Macro): String? = element.node.findChildByType(Types.IDENTIFIER)?.text
+
+    @JvmStatic
+    fun getLabelIdentifierString(element: Label): String? = element.lblDef?.text?.let {
+        it.substring(0, it.indexOf(':')).trim { it <= ' ' }
     }
 
-    fun getDefineIdentifier(element: Define): Identifier? {
-        val defineIdentifier = element.node.findChildByType(NASMTypes.IDENTIFIER)
-        return if (defineIdentifier != null) defineIdentifier.psi as Identifier else null
-    }
+    @JvmStatic
+    fun getConstantIdentifierString(element: Constant): String? = element.identifier.id.text
 
-    fun getMacroIdentifier(element: Macro): String? {
-        val macroIdentifier = element.node.findChildByType(NASMTypes.IDENTIFIER)
-        return macroIdentifier?.text
-    }
+    @JvmStatic
+    fun getName(element: Identifier): String = element.id.text
 
-    fun getLabelIdentifierString(element: Label): String? {
-        val labelDef = element.lblDef
-        if (labelDef != null) {
-            val labelDefString = labelDef.text
-            return labelDefString.substring(0, labelDefString.indexOf(':')).trim { it <= ' ' }
-        }
-        return null
-    }
-
-    fun getConstantIdentifierString(element: Constant): String? {
-        val identifier = element.identifier.id
-        return identifier?.text
-    }
-
-    fun getName(element: Identifier): String {
-        return element.id.text
-    }
-
+    @JvmStatic
     fun setName(element: Identifier, newName: String): PsiElement {
-        val keyNode = element.id.node
-        if (keyNode != null) {
+        element.id.node?.let {
             val property = ElementFactory.createIdentifier(element.project, newName)
-            val newKeyNode = property.firstChild.node
-            element.node.replaceChild(keyNode, newKeyNode)
+            element.node.replaceChild(it, property.firstChild.node)
         }
+
         return element
     }
 
+    @JvmStatic
     fun getNameIdentifier(element: Identifier): PsiElement {
         return element.id
     }
-
-    //public static String getLabelIdentifierString(LabelInstruction element) {
-    //    PsiElement labelIns = element.getLblIns();
-    //    if (labelIns != null) {
-    //        String labelInsString = labelIns.getText();
-    //        return labelInsString.substring(0, labelInsString.indexOf(':')).trim();
-    //    }
-    //    return null;
-    //}
-    //public static String getLabelIdentifierString(LabelData element) {
-    //    PsiElement lblData = element.getLblData();
-    //    if (lblData != null) {
-    //        String lblDataString = lblData.getText();
-    //        return lblDataString.substring(0, lblDataString.indexOf(':')).trim();
-    //    }
-    //    return null;
-    //}
-
-
 }

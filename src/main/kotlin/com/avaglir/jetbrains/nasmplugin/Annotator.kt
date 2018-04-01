@@ -24,6 +24,7 @@ import com.intellij.lang.annotation.AnnotationHolder
 import com.intellij.lang.annotation.Annotator
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.util.PsiTreeUtil
 
 class Annotator : Annotator {
@@ -62,7 +63,7 @@ class Annotator : Annotator {
                     }
 
                     is Macro, is MacroCall, is Assign, is Strlen ->
-                        element.parent.node.findChildByType(NASMTypes.IDENTIFIER)?.textRange.highlight(HighlightType.MACRO)
+                        element.parent.node.findChildByType(Types.IDENTIFIER)?.textRange?.highlight(HighlightType.MACRO)
 
                     is Constant -> {
                         element.highlight(HighlightType.CONSTANT)
@@ -82,7 +83,7 @@ class Annotator : Annotator {
             }
 
             is Define -> {
-                element.defineIdentifier.highlight(HighlightType.MACRO)
+                element.defineIdentifier?.highlight(HighlightType.MACRO)
 
                 element.containingFile.findAll<Identifier>().textMatching(element)
                         .filter { it.parent?.let {
@@ -92,12 +93,13 @@ class Annotator : Annotator {
             }
 
             is Label -> {
-                // TODO
-                element.labelDefMacro?.getMacroCall().getNumericExprList().takeIf { it.size == 1 }?.first().highlight(HighlightType.LABEL)
+                // FIXME
+                (element.labelDefMacro?.expr as MacroCall).numericExprList.takeIf { it.size == 1 }?.first()?.highlight(HighlightType.LABEL)
             }
 
             is LabelIdentifier -> {
-
+                if (element.parent is Struct || element.parent is IStruct) return
+                element.id?.highlight(HighlightType.LABEL)
             }
 
             is StructureField -> {
@@ -112,158 +114,72 @@ class Annotator : Annotator {
             }
 
             is SegmentAddress -> {
-                element.segmentAddrL?.let {
-                    val offset = it.textRange.startOffset + it.text.indexOf(':')
-                    TextRange(offset, offset + 1).highlight(HighlightType.SEPARATOR)
 
-                    return@annotate
-                }
+                fun segLeft() {
+                    element.segmentAddrL?.let {
+                        val offset = it.textRange.startOffset + it.text.indexOf(':')
+                        TextRange(offset, offset + 1).highlight(HighlightType.SEPARATOR)
 
-                if (element.lblDef == null) {
-
-                    segmentElement = element.labelDefMacro
-                    if (segmentElement != null) { // Its an macro on the left
-                        val tr = segmentElement.textRange
-                        highlightTextRange(tr.startOffset + tr.length - 1, 1,
-                                NASMSyntaxHighlighter.NASM_SEPARATOR, holder)
+                        return@segLeft
                     }
 
-                    return@annotate
-                }
+                    if (element.lblDef == null) {
+                        element.labelDefMacro?.let {
+                            val offset = it.textOffset + it.textRange.length - 1
+                            TextRange(offset, offset + 1).highlight(HighlightType.SEPARATOR)
+                        }
 
-                element.lblDef?.let { segElt ->
+                        return@segLeft
+                    }
+
+                    val segElt = element.lblDef!!
+
                     val sepIdx = segElt.text.indexOf(':')
                     val sepOffset = segElt.textOffset + sepIdx
                     TextRange(sepOffset, sepOffset + 1).highlight(HighlightType.SEPARATOR)
 
                     val idText = segElt.text.substring(0, sepIdx).trim { it <= ' ' } // this is weird
-                    element.containingFile.findAll<Constant>()
-                            .find { const ->
-                                const.constantIdentifierString == idText
-                            }?.let {
-                                TextRange(segElt.textOffset, segElt.textOffset + idText.length).highlight(HighlightType.CONSTANT)
-                            }
 
-                    return@annotate
+                    val bundle = HighlightBundle(holder, segElt.textOffset, segElt.textOffset + idText.length, segElt.containingFile)
+
+                    val highlit = bundle.matchAndHighlight<Constant>(HighlightType.CONSTANT) { it.constantIdentifierString == idText } ||
+                            bundle.matchAndHighlight<Define>(HighlightType.CONSTANT) { it.defineIdentifier?.textMatches(idText) ?: false } ||
+                            bundle.matchAndHighlight<Label>(HighlightType.LABEL) { it.labelIdentifierString?.let { it == idText } ?: false }
+
+
+                    if (!highlit) TextRange(segElt.textOffset, segElt.textOffset + idText.length).highlight(HighlightType.IDENTIFIER)
+
                 }
 
+                fun segRight() {
+                    val addrId = element.id
+                    addrId ?: return
 
+                    val range = addrId.textRange
+                    val bundle = HighlightBundle(holder, range.startOffset, range.endOffset, addrId.containingFile)
+                    val idText = addrId.text
+
+                    val highlit = bundle.matchAndHighlight<Constant>(HighlightType.CONSTANT) { it.constantIdentifierString == idText } ||
+                            bundle.matchAndHighlight<Define>(HighlightType.CONSTANT) { it.defineIdentifier?.textMatches(idText) ?: false } ||
+                            bundle.matchAndHighlight<Label>(HighlightType.LABEL) { it.labelIdentifierString?.let { it == idText } ?: false }
+
+                    if (!highlit) range.highlight(HighlightType.IDENTIFIER)
+                }
+
+                segLeft()
+                segRight()
             }
-        }
-
-    if (element is NASMSegmentAddress) {
-            // Handle segment (left side) value
-            var segmentElement = element.segmentAddrL
-            if (segmentElement != null) { // Its a number on the left
-                val segAddrText = segmentElement.text
-                val separatorIdx = segAddrText.indexOf(':')
-                val tr = segmentElement.textRange
-                highlightTextRange(tr.startOffset + separatorIdx, 1, NASMSyntaxHighlighter.NASM_SEPARATOR, holder)
-            } else {
-                segmentElement = element.lblDef
-                if (segmentElement != null) { // Its an identifer on the left
-                    val lblDefText = segmentElement.text
-                    val separatorIdx = lblDefText.indexOf(':')
-                    val tr = segmentElement.textRange
-                    highlightTextRange(tr.startOffset + separatorIdx, 1, NASMSyntaxHighlighter.NASM_SEPARATOR, holder)
-                    val identifierText = lblDefText.substring(0, separatorIdx).trim { it <= ' ' }
-                    var found = false
-                    // Search for a constant
-                    val constants = NASMUtil.findConstants(element.getContainingFile())
-                    for (constant in constants) {
-                        val constantIdentifier = constant.constantIdentifierString
-                        if (constantIdentifier != null && constantIdentifier == identifierText) {
-                            found = true
-                            highlightTextRange(tr.startOffset, identifierText.length,
-                                    NASMSyntaxHighlighter.NASM_CONSTANT, holder)
-                            break
-                        }
-                    }
-                    // Search for a preprocessor define
-                    if (!found) {
-                        val defines = NASMUtil.findPreprocessorDefines(element.getContainingFile())
-                        for (define in defines) {
-                            val defineIdentifier = define.defineIdentifierString
-                            if (defineIdentifier != null && defineIdentifier == identifierText) {
-                                found = true
-                                highlightTextRange(tr.startOffset, identifierText.length, NASMSyntaxHighlighter.NASM_CONSTANT, holder)
-                                break
-                            }
-                        }
-                    }
-                    // Search for a label
-                    if (!found) {
-                        val labels = NASMUtil.findLabels(element.getContainingFile())
-                        for (label in labels) {
-                            val labelIdentifier = label.labelIdentifierString
-                            if (labelIdentifier != null && labelIdentifier == identifierText) {
-                                found = true
-                                highlightTextRange(tr.startOffset, identifierText.length,
-                                        NASMSyntaxHighlighter.NASM_LABEL, holder)
-                                break
-                            }
-                        }
-                    }
-                    // If a match wasnt found, color it a generic identifier color
-                    if (!found) {
-                        highlightTextRange(tr.startOffset, identifierText.length,
-                                NASMSyntaxHighlighter.NASM_IDENTIFIER, holder)
-                    }
-                } else {
-                    segmentElement = element.labelDefMacro
-                    if (segmentElement != null) { // Its an macro on the left
-                        val tr = segmentElement.textRange
-                        highlightTextRange(tr.startOffset + tr.length - 1, 1,
-                                NASMSyntaxHighlighter.NASM_SEPARATOR, holder)
-                    }
-                }// Label def macro
-            }// Label def
-            // Handle address (right side) value
-            val addrIdentifier = element.id
-            if (addrIdentifier != null) { // if it is not null that means the address value is an identifier
-                val addrIdentifierText = addrIdentifier.text
-                val tr = addrIdentifier.textRange
-                var found = false
-                // Search for a constant
-                val constants = NASMUtil.findConstants(element.getContainingFile())
-                for (constant in constants) {
-                    val constantIdentifier = constant.constantIdentifierString
-                    if (constantIdentifier == addrIdentifierText) {
-                        found = true
-                        highlightTextRange(tr, NASMSyntaxHighlighter.NASM_CONSTANT, holder)
-                        break
-                    }
-                }
-                // Search for a preprocessor define
-                if (!found) {
-                    val defines = NASMUtil.findPreprocessorDefines(element.getContainingFile())
-                    for (define in defines) {
-                        val defineIdentifier = define.defineIdentifierString
-                        if (defineIdentifier != null && defineIdentifier == addrIdentifierText) {
-                            found = true
-                            highlightTextRange(tr, NASMSyntaxHighlighter.NASM_CONSTANT, holder)
-                            break
-                        }
-                    }
-                }
-                // Search for a label
-                if (!found) {
-                    val labels = NASMUtil.findLabels(element.getContainingFile())
-                    for (label in labels) {
-                        val labelIdentifier = label.labelIdentifierString
-                        if (labelIdentifier != null && labelIdentifier == addrIdentifierText) {
-                            found = true
-                            highlightTextRange(tr, NASMSyntaxHighlighter.NASM_LABEL, holder)
-                            break
-                        }
-                    }
-                }
-                // If a match wasnt found, color it a generic identifier color
-                if (!found) {
-                    highlightTextRange(tr, NASMSyntaxHighlighter.NASM_IDENTIFIER, holder)
-                }
-            } // Otherwise hexadecimal values are already highlighted properly
         }
     }
 
+    private data class HighlightBundle(val holder: AnnotationHolder, val start: Int, val end: Int, val file: PsiFile) {
+        inline fun <reified T: PsiElement> matchAndHighlight(type: HighlightType, block: (T) -> Boolean): Boolean {
+            return file.findAll<T>()
+                    .find(block)?.let {
+                        val annotation = holder.createInfoAnnotation(TextRange(start, end), null)
+                        annotation.textAttributes = type.attrKey
+                        true
+                    } ?: false
+        }
+    }
 }

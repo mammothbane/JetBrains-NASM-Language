@@ -19,7 +19,7 @@
 
 package com.avaglir.jetbrains.nasmplugin
 
-import com.avaglir.jetbrains.nasmplugin.psi.NASMTypes
+import com.avaglir.jetbrains.nasmplugin.psi.Types
 import com.intellij.lang.BracePair
 import com.intellij.lang.PairedBraceMatcher
 import com.intellij.psi.PsiFile
@@ -41,13 +41,13 @@ class PairedBraceMatcher : PairedBraceMatcher {
 
     companion object {
         private val BRACE_PAIRS = arrayOf(
-            BracePair(NASMTypes.SQUARE_L, NASMTypes.SQUARE_R, true),
-            BracePair(NASMTypes.ROUND_L, NASMTypes.ROUND_R, false),
-            BracePair(NASMTypes.MACRO_TAG, NASMTypes.MACRO_END_TAG, true),
-            BracePair(NASMTypes.STRUC_TAG, NASMTypes.ENDSTRUC_TAG, true),
-            BracePair(NASMTypes.ISTRUC_TAG, NASMTypes.IEND_TAG, true),
-            BracePair(NASMTypes.IF_TAG, NASMTypes.ENDIF_TAG, true),
-            BracePair(NASMTypes.IFMACRO_TAG, NASMTypes.ENDIF_TAG, true)
-        )//new BracePair(NASMTypes.ELIF_TAG, NASMTypes.ENDIF_TAG, false),
+            BracePair(Types.SQUARE_L, Types.SQUARE_R, true),
+            BracePair(Types.ROUND_L, Types.ROUND_R, false),
+            BracePair(Types.MACRO_TAG, Types.MACRO_END_TAG, true),
+            BracePair(Types.STRUC_TAG, Types.ENDSTRUC_TAG, true),
+            BracePair(Types.ISTRUC_TAG, Types.IEND_TAG, true),
+            BracePair(Types.IF_TAG, Types.ENDIF_TAG, true),
+            BracePair(Types.IFMACRO_TAG, Types.ENDIF_TAG, true)
+        )//new BracePair(Types.ELIF_TAG, Types.ENDIF_TAG, false),
     }
 }
