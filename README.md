@@ -1,62 +1,32 @@
 # JetBrains NASM Language Support
 
-A plugin that adds NASM support for the IntelliJ Platform IDEs.
+A plugin that adds NASM support for the IntelliJ Platform IDEs. 
+
+This is a fork of `dude719`'s repo that I made because I wanted to fix handling of section attributes but really 
+didn't want to be staring at Java.
 
 ![NASM Language](http://i.imgur.com/0BW2jL7.png "NASM Language Preview")
 
 # Features
 
-Version v0.3-beta.1 pre-release
+Version 0.1.0
 
-    FPU, MMX, SSE, SSE2, SSE3, SSE4, AVX, AVX2, AVX512, Virtualization, and General instruction support
     Syntax highlighting
-    Single and multiline macro support
-    Conditional assembly directives support
+    Wide range of supported instructions
+    Macro support
     Preprocessor directives support
-    Structure support
-    Brace matching for braces, macros, preprocessor, and structs
-    Improved macro highlighting
-
-## TODO
-- Code Completion
-- Find Usages
-- Goto Symbol
-- Debugger Support
+    Struct support
+    Limited brace matching
 
 # Changelog
 
-    Added macro syntax highlighting.
-    Added support for conditional assembly directives.
-    Fix for bug where blank comments would not match the comment regex.
-    Added support for structures and improved highlighting.
-    Fixed conditional assembly problems.
-    Fixed number size prefixes, segment addresses, data/instruction labels.
-    Added new operator expressions.
-    Added pinning for some repeating rules.
-    Added system instructions.
-    Added highlighting for segment addresses, and structure references.
-    Fix for blank labels in structs.
-    Fixed istruc structure parsing.
-    Added support for the RETF instruction.
-    Added bitwise operations and fixed macro label definitions.
-    Added BSS section.
-    Now allow structs to have macros and identifiers.
-    Fixed macro labels.
-    Allow expressions in struc fields.
-    Can now prefix expressions with bitwise NOT, minus, or plus symbol.
-    Fixed segment addresses.
-    Added AVX, AVX2, AVX512, and Virtualization instruction sets.
-    Added brace matching for braces, macros, preprocessor, and structs.
-    Fixed size type prefixes on expressions.
-    Added identifiers to istruc structure instances.
-    Added .RDATA section directive.
-    Added improved macro highlighting.
-    Fixed a null pointer exception that would happen with labels in segment addresses.
-    Added highlighting for macros in segment part of segment addresses.
-    Fixed section and segment directives so you can use any section/segment name.
-    Can now use size prefixes for macro calls/references.
 
 # License
+## Commentary
+I hate the fact that this is GPL.
+
+## Legal
+Modifications copyright © 2018 Nathan Perry. All rights reserved to the greatest extent permissible by law. 
 
 Copyright (C) 2017 Aidan Khoury (dude719)
 
